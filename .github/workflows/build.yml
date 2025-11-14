@@ -10,9 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # -----------------------------
-      # Setup Python backend (uv + PyInstaller)
-      # -----------------------------
+      # 后端
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 
@@ -31,43 +29,33 @@ jobs:
       - name: Copy backend.exe into Electron app
         run: copy backend\dist\fastapi-backend.exe frontend\resources\fastapi-backend.exe
 
-      # -----------------------------
-      # Setup Electron frontend (Node.js + Vite + electron-builder)
-      # -----------------------------
+      # 前端
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install Node dependencies
-        working-directory: frontend
+        working-directory: frontend/electron
         run: npm install
 
       - name: Build Electron Windows installer
-        working-directory: frontend
-        run: npm run build
+        working-directory: frontend/electron
+        run: npm run electron:build
 
-      # -----------------------------
-      # Upload build artifacts
-      # -----------------------------
+      # 上传与发布
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastapi-windows-build
+          path: backend/dist/*.exe
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: electron-windows-build
-          path: |
-            frontend/dist/*.exe
-            frontend/dist/*.msi
-
-      # -----------------------------
-      # Auto Release (if push tag)
-      # -----------------------------
-      - name: Release
-        uses: softprops/action-gh-release@v2
+          path: frontend/release/*.exe
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            frontend/dist/*.exe
-            frontend/dist/*.msi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: electron-windows-unpacked-build
+          path: frontend/release/win-unpacked/*.exe

@@ -47,6 +47,8 @@ function createWindow() {
     const indexPath = join(__dirname, '..', 'index.html')
     console.log('Loading index from:', indexPath)
     mainWindow.loadFile(indexPath)
+    // 打开开发者工具
+    mainWindow.webContents.openDevTools()
   }
 
   // 窗口关闭时释放引用
