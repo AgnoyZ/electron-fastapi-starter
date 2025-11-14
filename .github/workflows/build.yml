@@ -27,8 +27,9 @@ jobs:
         run: uv run pyinstaller --onefile app/main.py --name fastapi-backend
 
       - name: Copy backend.exe into Electron app
-        run: copy backend\dist\fastapi-backend.exe frontend\resources\fastapi-backend.exe
-
+        run: |
+          mkdir -p frontend/resources
+          cp backend/dist/fastapi-backend.exe frontend/resources/fastapi-backend.exe
       # 前端
       - name: Setup Node.js
         uses: actions/setup-node@v4
